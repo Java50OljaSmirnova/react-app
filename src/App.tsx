@@ -1,24 +1,23 @@
 import React from 'react';
 
 import './App.css';
-import { Timer } from './components/Timer';
+import { CounterMultiply } from './components/CounterMultiply';
+import { CounterSquare } from './components/CounterSquare';
+import { CounterUpdater } from './components/CounterUpdater';
+import { useSelector } from 'react-redux';
+import { Logout } from './components/Logout';
+import { Login } from './components/Login';
 
 function App() {
-  const column : React.CSSProperties = {display: "flex", flexDirection: "column", 
-  height: "90vh", justifyContent: "center"};
-  const row : React.CSSProperties = {display: "flex", flexDirection: "row",
-   justifyContent: "space-around"};
-  return <div style={column}>
-    <div style={row}>
-    <Timer cityCountry='Israel'/>
-    <Timer cityCountry='New York'/>
-    </div>
-    <div style={row}>
-    <Timer cityCountry='Yekaterinburg'/>
-    <Timer cityCountry='Japan'/>
-    </div>
-    </div>
-  
+const authUser = useSelector<any, string>(state=> state.auth.authUser)
+  return <div style={{ display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
+    {authUser && <CounterUpdater operand={10} />}
+    {authUser.includes('admin') && <CounterMultiply factor={2} />}
+    {authUser && <CounterSquare />}
+    {authUser && <Logout/>}
+    {!authUser && <Login/>}
+  </div>
+
 }
 
 export default App;
