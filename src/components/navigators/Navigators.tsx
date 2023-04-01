@@ -17,10 +17,12 @@ export const Navigator: React.FC<Props> = ({ subnav, routes }) => {
         return routes.map((route, index) =>
             <li className="navigator-item" key={index}><NavLink to={route.path}>{route.label}</NavLink></li>)
     }
-    return <div>
+    return <div style={{marginTop: "10vh"}}>
+        <nav>
         <ul className={`navigator-list ${subnav ? 'navigator-sublist' : ''}`}>
             {getItems()}
         </ul>
+        </nav>
         <Outlet></Outlet>
     </div>
 }

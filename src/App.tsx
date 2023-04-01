@@ -10,15 +10,16 @@ import { Dairy } from './components/pages/Dairy';
 import { Bread } from './components/pages/Bread';
 import { NotFound } from './components/pages/NotFound';
 import { routes } from './config/loyaut-config';
-import { Navigator } from './components/navigators/Navigators';
 import { routesProduct } from './config/products-config';
+import { NavigatorDesktop } from './components/navigators/NavigatorDesktop';
+import { Navigator } from './components/navigators/Navigators';
 
 
 
 function App() {
   return <BrowserRouter>
     <Routes>
-      <Route path='/' element={<Navigator routes={routes} />}>
+      <Route path='/' element={<NavigatorDesktop routes={routes} />}>
         <Route index element={<Home />} />
         <Route path='customers' element={<Customers />} />
         <Route path='orders' element={<Orders />} />
