@@ -5,7 +5,7 @@ export const Layout: React.FC = () => {
     return <div>
         <nav>
             <ul className="navigator-list">
-                <li className="navigator-item">
+                <li className="navigator-item" >
                     <NavLink to='/'>Home</NavLink>
                 </li>
                 <li className="navigator-item">
@@ -19,6 +19,12 @@ export const Layout: React.FC = () => {
                 </li>
                 <li className="navigator-item">
                     <NavLink to='/products'>Products</NavLink>
+                </li>
+                <li className="navigator-item">
+                    <NavLink to='/login'>Login</NavLink>
+                </li>
+                <li className="navigator-item">
+                    <NavLink to='/logout'>Logout</NavLink>
                 </li>
             </ul>
         </nav>

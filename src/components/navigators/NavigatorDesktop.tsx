@@ -12,8 +12,9 @@ export const NavigatorDesktop: React.FC<Props> = ({ subnav, routes }) => {
     useEffect(() => {
          if (!subnav){
             navigate(routes[0].path)
+            setValue(0)
         }
-         }, [])
+         }, [routes])
     const handleChange = (event: any, newValue: number) => {
         setValue(newValue)
     };
