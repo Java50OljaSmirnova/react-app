@@ -1,3 +1,3 @@
 export const Dairy: React.FC = () => {
-    return <h2>Dairy Products Loaded</h2>
+    return <h2>Dairy Products Loadded</h2>
 }

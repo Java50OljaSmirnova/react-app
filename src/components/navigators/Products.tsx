@@ -5,10 +5,10 @@ export const Products: React.FC = () => {
         <nav>
             <ul className="navigator-list navigator-sublist">
                 <li className="navigator-item">
-                    <NavLink to='/products/dairy'>Dairy</NavLink>
+                    <NavLink to='/products/dairy'>Dairy Products</NavLink>
                 </li>
                 <li className="navigator-item">
-                    <NavLink to='/products/bread'>Bread</NavLink>
+                    <NavLink to='/products/bread'>Bread  Products</NavLink>
                 </li>
             </ul>
         </nav>
