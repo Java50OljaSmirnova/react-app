@@ -1,17 +1,14 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import './App.css';
-import { Bread } from './components/pages/Bread';
+
 import { Customers } from './components/pages/Customers';
-import { Dairy } from './components/pages/Dairy';
 import { Home } from './components/pages/Home';
 import { NotFound } from './components/pages/NotFound';
 import { Orders } from './components/pages/Orders';
 import { ShoppingCart } from './components/pages/ShoppingCart';
 import { routes } from './config/loyaut-config'
-import { Navigator } from './components/navigators/Navigator';
-import { routesProduct } from './config/products-config';
 import { NavigatorDesktop } from './components/navigators/NavigatorDesktop';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteType } from './model/RouteType';
@@ -21,6 +18,9 @@ import { productsService } from './config/products-service-config';
 import { productsActions } from './redux/productsSlice';
 import { ProductType } from './model/ProductType';
 import { Products } from './components/pages/Products';
+import { ordersService } from './config/orders-service-config';
+import { shoppingAction} from './redux/shoppingSlice';
+import { Subscription } from 'rxjs';
 
 function App() {
   const authUser = useSelector<any, string>(state => state.auth.authUser);
@@ -38,7 +38,7 @@ function App() {
   function routePredicate(route: RouteType): boolean | undefined {
     return route.always || (route.authenticated && !!authUser)
       || (route.admin && authUser.includes('admin')) ||
-      (route.no_authenticated && !authUser)
+      (route.no_authenticated && !authUser) || (route.client && !!authUser && !authUser.includes('admin'))
   }
   useEffect(() => {
     setRoutes(getRoutes());
@@ -52,7 +52,23 @@ function App() {
         }
     })
     return () => subscription.unsubscribe();
-  })
+  }, []);
+  useEffect(() => {
+    let subscription: Subscription;
+    if(authUser != '' && !authUser.includes("admin")){
+      subscription = ordersService.getShoppingCard(authUser).subscribe({
+        next: (shopping) => dispatch(shoppingAction.setShopping(shopping))
+      })
+    } else {
+      dispatch(shoppingAction.resetShopping())
+    }
+    return () => {
+      if(subscription) {
+        subscription.unsubscribe();
+      }
+
+    }
+  }, [authUser]);
   return <BrowserRouter>
     <Routes>
       <Route path='/' element={<NavigatorDesktop routes={routesState} />}>
