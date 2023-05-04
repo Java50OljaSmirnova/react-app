@@ -29,6 +29,7 @@ export const ProductsAdmin: React.FC = () => {
         if(rowDataNew.cost < 1 || rowDataNew.cost > rowDataOld.cost * 1.5){
             throw 'cost must be greater than 0 and cannot be greater than on 50% from the existing cost'
         }
+        await productsService.changeProduct(rowDataNew, rowDataNew.id as string)
         return newRow;
     }
     return <Box sx={{width: "100vw",display: "flex", justifyContent:"center"}}>

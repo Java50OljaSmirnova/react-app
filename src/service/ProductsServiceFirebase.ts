@@ -24,6 +24,10 @@ export class ProductsServiceFirebase implements ProductsService {
     async removeProduct(id: string): Promise<void> {
         await deleteDoc(doc(this.productsCollection, id))
     }
+    async changeProduct(product: ProductType, id: string): Promise<void> {
+        await deleteDoc(doc(this.productsCollection, id));
+        await setDoc(doc(this.productsCollection, id), product);
+    }
     async removeCategory(category: string): Promise<void> {
         await deleteDoc(doc(this.categoriesCollection, category))
     }
