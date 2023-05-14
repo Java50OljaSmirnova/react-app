@@ -21,6 +21,9 @@ import { Products } from './components/pages/Products';
 import { ordersService } from './config/orders-service-config';
 import { shoppingAction} from './redux/shoppingSlice';
 import { Subscription } from 'rxjs';
+import { CategoryType } from './model/CategoryType';
+import { categoriesActions } from './redux/categoriesSlice';
+import { ordersActions } from './redux/ordersSlice';
 
 function App() {
   const authUser = useSelector<any, string>(state => state.auth.authUser);
@@ -54,6 +57,16 @@ function App() {
     return () => subscription.unsubscribe();
   }, []);
   useEffect(() => {
+    const subscription = productsService.getCategories()
+    .subscribe({
+      next: (categories: CategoryType[]) => {
+        const categoryNames: string[] = categories.map(c => c.name);
+        dispatch(categoriesActions.setCategories(categoryNames));
+      }
+    })
+    return () => subscription.unsubscribe();
+  }, [])
+  useEffect(() => {
     let subscription: Subscription;
     if(authUser != '' && !authUser.includes("admin")){
       subscription = ordersService.getShoppingCard(authUser).subscribe({
@@ -69,6 +82,20 @@ function App() {
 
     }
   }, [authUser]);
+  useEffect(() => {
+    let subscription: Subscription;
+    if(authUser){
+        subscription = authUser.includes('admin') ? ordersService.getAllOrders().
+        subscribe({
+          next: (orders) => dispatch(ordersActions.setOrders(orders))
+        }) : ordersService.getCustomerOrders(authUser).
+        subscribe({
+          next: (orders) => dispatch(ordersActions.setOrders(orders))
+        })
+    }
+    return () => subscription && subscription.unsubscribe();
+  }, [authUser]);
+
   return <BrowserRouter>
     <Routes>
       <Route path='/' element={<NavigatorDesktop routes={routesState} />}>

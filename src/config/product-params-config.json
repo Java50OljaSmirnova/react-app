@@ -1,0 +1,5 @@
+{
+    "units": ["piece", "100g", "box", "loaf"],
+    "minCost": 3,
+    "maxCost": 300
+}

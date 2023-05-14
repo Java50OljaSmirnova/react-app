@@ -1,6 +1,3 @@
 import { ProductType } from "./ProductType";
 
-export type ShoppingDataType = ProductType & {
-    count: number;
-    price: number;
-}
+export type ShoppingDataType = ProductType & { count: number, price: number}

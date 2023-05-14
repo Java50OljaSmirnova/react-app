@@ -1,13 +1,17 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { authReducer } from "./authSlice";
 import { codeReducer } from "./codeSlice";
-import { productsReduser } from "./productsSlice";
+import { productsReducer } from "./productsSlice";
 import { shoppingReducer } from "./shoppingSlice";
+import { categoriesReducer } from "./categoriesSlice";
+import { ordersReducer } from "./ordersSlice";
 export const store: any = configureStore({
     reducer:{
         auth: authReducer,
         codeState: codeReducer,
-        productsState: productsReduser,
-        shoppingState: shoppingReducer
+        productsState: productsReducer,
+        shoppingState: shoppingReducer,
+        categoriesState: categoriesReducer,
+        ordersState: ordersReducer
     }
 })

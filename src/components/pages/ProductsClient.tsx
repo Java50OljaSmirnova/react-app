@@ -1,4 +1,4 @@
-import { Typography, Grid, Card, CardMedia, CardContent, CardActions, Button, IconButton } from "@mui/material"
+import { Typography, Grid, Card, CardMedia, CardContent, CardActions, Button} from "@mui/material"
 import { useSelector } from "react-redux"
 import { ProductType } from "../../model/ProductType"
 import { ReactNode, useMemo } from "react";
@@ -27,9 +27,9 @@ export const ProductsClient: React.FC = () => {
         return count;
     }
     function getProductCards(): ReactNode {
-        return products.map((p, index) => <Grid item xs={8} sm={5} md={3}>
+        return products.map((p, index) => <Grid item xs={8} sm={5} md={3} key={index}>
             <Card>
-                <CardMedia sx={{ height: 180 }} image={`images/${p.image}`} />
+                <CardMedia sx={{ height: 140 }} image={ p.image}/>
                 <CardContent sx={{
                     textAlign: "center",
                     backgroundColor: "aliceblue"
@@ -53,8 +53,12 @@ export const ProductsClient: React.FC = () => {
                                 ordersService.addShoppingProductUnit(authUser, p.id!);
                             }
                         }} ><Add /></Button></Grid>
-                        <Grid item xs={4}><Typography sx={{ fontSize: "1.2em", display: "flex", width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>{counts[index]}</Typography></Grid>
-                        <Grid item xs={4}><Button size="large" onClick={async () => ordersService.removeShoppingProductUnit(authUser, p.id!)} disabled={counts[index] == 0}><Remove></Remove></Button></Grid>
+                        <Grid item xs={4}><Typography sx={{ fontSize: "1.2em", display: "flex", 
+                        width: "100%", height: "100%", alignItems: "center", justifyContent: "center" }}>
+                            {counts[index]}</Typography></Grid>
+                        <Grid item xs={4}><Button size="large" onClick={async () => 
+                            ordersService.removeShoppingProductUnit(authUser, p.id!)} 
+                            disabled={counts[index] == 0}><Remove/></Button></Grid>
                     </Grid>
                 </CardActions>
             </Card>
