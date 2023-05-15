@@ -7,15 +7,21 @@ import { Alert, Avatar, Box, Button, Snackbar, Typography } from "@mui/material"
 import { useMemo, useRef, useState } from "react";
 import { ordersService } from "../../config/orders-service-config";
 import { Delete } from "@mui/icons-material";
+import ConfirmationDialog from "../ConfirmationDialog";
 
 export const ShoppingCart: React.FC = () => {
     const [open, setOpen] = useState<boolean>(false);
     const alertMessage = useRef<string>('');
+    const [productId, setProductId] = useState('');
+    const [isAgree, setIsAgree] = useState<boolean>(false)
+    const dailogTitle = "Delete this product?"
+    const dialogContent = "Do you really want to delete this product from shopping cart? You always can to choose this product again"
     const products = useSelector<any, ProductType[]>(state => state.productsState.products);
     const shopping = useSelector<any, ShoppingProductType[]>(state => state.shoppingState.shopping);
     const authUser = useSelector<any, string>(state => state.auth.authUser);
     const columns: GridColDef[] = [
-        { field: "image", headerName: "", flex: 0.5, align: "center", sortable: false, headerAlign: "center",
+        {
+            field: "image", headerName: "", flex: 0.5, align: "center", sortable: false, headerAlign: "center",
             renderCell: (params) => <Avatar src={params.value} sx={{ width: "50%", height: "12vh" }} />
         },
         { field: "title", headerName: "Title", flex: 0.8, align: 'center', headerAlign: 'center' },
@@ -26,12 +32,17 @@ export const ShoppingCart: React.FC = () => {
         {
             field: "actions", type: 'actions', flex: 0.1, getActions: (params) => [
                 <GridActionsCellItem label="remove" icon={<Delete></Delete>}
-                    onClick={async () => await ordersService.removeShoppingProduct(authUser, params.id as string)} />
+                    onClick={() => {setIsAgree(true); setProductId(params.id as string)}} />
             ]
         }
     ]
     const tableData = useMemo(() => getTableData(), [products, shopping]);
     const total = useMemo(() => getTotalCost(), [tableData]);
+
+    async function deleteProduct(params: string): Promise<void> {
+        await ordersService.removeShoppingProduct(authUser, params);
+        setIsAgree(false)
+    }
     async function updateCount(newRow: any): Promise<any> {
         const rowData: ShoppingDataType = newRow;
         if (rowData.count < 1) {
@@ -68,6 +79,9 @@ export const ShoppingCart: React.FC = () => {
                     setOpen(true)
                 }} />
         </Box>
+        <ConfirmationDialog dialogContent={dialogContent} dialogTitle={dailogTitle}
+            id={productId} setId={setProductId} deletion={deleteProduct} isAgree={isAgree}
+            setIsAgree={setIsAgree}></ConfirmationDialog>
         <Typography variant="h6">Total cost: {total.toFixed(2)}{' '}
             <img src="images/israeli-shekel-icon.svg" width="3%" /></Typography>
         <Snackbar open={open} autoHideDuration={6000} onClose={() => setOpen(false)}>

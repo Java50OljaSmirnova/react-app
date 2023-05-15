@@ -6,10 +6,15 @@ import { Delete, Add } from "@mui/icons-material"
 import { productsService } from "../../config/products-service-config"
 import { useRef, useState } from "react"
 import { ProductForm } from "../forms/ProductForm"
+import ConfirmationDialog from "../ConfirmationDialog"
 export const ProductsAdmin: React.FC = () => {
     const alertMessage = useRef<string>('');
-    const [open, setOpen] = useState<boolean>(false)
-    const [flAdd, setFlAdd] = useState<boolean>(false)
+    const [open, setOpen] = useState<boolean>(false);
+    const [isAgree, setIsAgree] = useState<boolean>(false);
+    const [productId, setProductId] = useState('');
+    const [flAdd, setFlAdd] = useState<boolean>(false);
+    const dailogTitle = "Delete this product?"
+    const dialogContent = "Do you really want to delete this product from collection?"
     const products: ProductType[] =
         useSelector<any, ProductType[]>(state => state.productsState.products);
     const columns: GridColDef[] = [
@@ -22,10 +27,14 @@ export const ProductsAdmin: React.FC = () => {
         {
             field: 'actions', type: 'actions', flex: 0.2, getActions: (params) => [
                 <GridActionsCellItem label="remove" icon={<Delete></Delete>}
-                    onClick={async () => await productsService.removeProduct(params.id as string)} />
+                    onClick={async () => {setIsAgree(true);  setProductId(params.id as string)}} />
             ]
         }
     ]
+    async function deleteProduct(params: string): Promise<void> {
+        await productsService.removeProduct(params);
+        setIsAgree(false)
+    }
     async function ubdateCost(newRow: any, oldRow: any): Promise<any> {
         const rowDataNew: ProductType = newRow;
         const rowDataOld: ProductType = oldRow;
@@ -59,6 +68,9 @@ export const ProductsAdmin: React.FC = () => {
                 }}
             />
         </Box>
+        <ConfirmationDialog dialogContent={dialogContent} dialogTitle={dailogTitle}
+            id={productId} setId={setProductId} deletion={deleteProduct} isAgree={isAgree}
+            setIsAgree={setIsAgree}></ConfirmationDialog>
         <Button onClick={() => setFlAdd(true)}>
             <Add></Add>
         </Button>
