@@ -9,7 +9,7 @@ import { NotFound } from './components/pages/NotFound';
 import { Orders } from './components/pages/Orders';
 import { ShoppingCart } from './components/pages/ShoppingCart';
 import { routes } from './config/loyaut-config'
-import { NavigatorDesktop } from './components/navigators/NavigatorDesktop';
+import { Navigator } from './components/navigators/Navigator';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteType } from './model/RouteType';
 import { Login } from './components/pages/Login';
@@ -98,7 +98,7 @@ function App() {
 
   return <BrowserRouter>
     <Routes>
-      <Route path='/' element={<NavigatorDesktop routes={routesState} />}>
+      <Route path='/' element={<Navigator routes={routesState} />}>
         <Route index element={<Home />} />
         <Route path='customers' element={<Customers />} />
         <Route path='orders' element={<Orders />} />

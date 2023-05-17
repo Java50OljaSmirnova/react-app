@@ -7,14 +7,17 @@ import { productsService } from "../../config/products-service-config"
 import { useRef, useState } from "react"
 import { ProductForm } from "../forms/ProductForm"
 import ConfirmationDialog from "../ConfirmationDialog"
+const UPDATE = 'Updating product cost?'
+const REMOVE = 'Removing product?'
 export const ProductsAdmin: React.FC = () => {
     const alertMessage = useRef<string>('');
     const [open, setOpen] = useState<boolean>(false);
-    const [isAgree, setIsAgree] = useState<boolean>(false);
-    const [productId, setProductId] = useState('');
+    const [openConfirmation, setOpenConfirmation] = useState<boolean>(false);
     const [flAdd, setFlAdd] = useState<boolean>(false);
-    const dailogTitle = "Delete this product?"
-    const dialogContent = "Do you really want to delete this product from collection?"
+    const title = useRef<string>('');
+    const content = useRef<string>('')
+    const idRef = useRef<string>('');
+    const row = useRef<any>();
     const products: ProductType[] =
         useSelector<any, ProductType[]>(state => state.productsState.products);
     const columns: GridColDef[] = [
@@ -27,22 +30,34 @@ export const ProductsAdmin: React.FC = () => {
         {
             field: 'actions', type: 'actions', flex: 0.2, getActions: (params) => [
                 <GridActionsCellItem label="remove" icon={<Delete></Delete>}
-                    onClick={async () => {setIsAgree(true);  setProductId(params.id as string)}} />
+                    onClick={() => {
+                        idRef.current = params.id as string;
+                        title.current = REMOVE;
+                        content.current = `You are going to remove ${params.row.title}(${params.row.unit})`
+                        setOpenConfirmation(true)
+                    }} />
             ]
         }
     ]
-    async function deleteProduct(params: string): Promise<void> {
-        await productsService.removeProduct(params);
-        setIsAgree(false)
-    }
+  
     async function ubdateCost(newRow: any, oldRow: any): Promise<any> {
-        const rowDataNew: ProductType = newRow;
-        const rowDataOld: ProductType = oldRow;
-        if (rowDataNew.cost < 1 || rowDataNew.cost > rowDataOld.cost * 1.5) {
+        const newCost: number = +newRow;
+        const oldCost: number = +oldRow;
+        if (newCost < 1 || newCost > oldCost * 1.5) {
             throw 'cost must be greater than 0 and cannot be greater than on 50% from the existing cost'
         }
-        await productsService.changeProduct(rowDataNew, rowDataNew.id as string)
-        return newRow;
+        idRef.current = newRow.id;
+        title.current = UPDATE;
+        content.current = `You are going to update cost from ${oldCost} to ${newCost}
+        of the ${newRow.title}(${newRow.unit})`
+        row.current = newRow;
+        setOpenConfirmation(true);
+        return oldRow;
+        
+    }
+    function updateCostError(error: any) {
+        alertMessage.current = error;
+        setOpen(true);
     }
     function submitAddProduct(product: ProductType){
         let res = '';
@@ -55,6 +70,17 @@ export const ProductsAdmin: React.FC = () => {
         
         return res;
     }
+    function closeFn(isAgree: boolean): void {
+        if (isAgree) {
+            if (title.current == REMOVE) {
+                productsService.removeProduct(idRef.current);
+            } else {
+                productsService.changeProduct(row.current, idRef.current)
+            }
+
+        }
+        setOpenConfirmation(false);
+    }
 
     return !flAdd ? <Box sx={{
         width: "100vw", display: "flex", flexDirection: 'column',
@@ -62,15 +88,9 @@ export const ProductsAdmin: React.FC = () => {
     }}>
         <Box sx={{ width: "80vw", height: "80vh" }}>
             <DataGrid columns={columns} rows={products} getRowHeight={() => 'auto'}
-                processRowUpdate={ubdateCost} onProcessRowUpdateError={(error) => {
-                    alertMessage.current = error;
-                    setOpen(true);
-                }}
+                processRowUpdate={ubdateCost} onProcessRowUpdateError={updateCostError}
             />
         </Box>
-        <ConfirmationDialog dialogContent={dialogContent} dialogTitle={dailogTitle}
-            id={productId} setId={setProductId} deletion={deleteProduct} isAgree={isAgree}
-            setIsAgree={setIsAgree}></ConfirmationDialog>
         <Button onClick={() => setFlAdd(true)}>
             <Add></Add>
         </Button>
@@ -79,5 +99,8 @@ export const ProductsAdmin: React.FC = () => {
                 {alertMessage.current}
             </Alert>
         </Snackbar>
+        <ConfirmationDialog content={content.current} title={title.current}
+            open={openConfirmation}
+            onCloseFn={closeFn}></ConfirmationDialog>
     </Box> : <ProductForm submitFn={submitAddProduct}></ProductForm>
 }

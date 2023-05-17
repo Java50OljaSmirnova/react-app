@@ -1,45 +1,38 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
-import { useState } from "react";
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 
 type Props = {
-  dialogContent: string,
-  dialogTitle: string,
-  id: string,
-  setId: any,
-  deletion: any,
-  isAgree: boolean, 
-  setIsAgree: any
+  content: string,
+  title: string,
+  open: boolean, 
+  onCloseFn: (isAgree: boolean) => void;
 
 }
-export const ConfirmationDialog: React.FC<Props> = ({ dialogContent, dialogTitle, id, setId, deletion, isAgree, setIsAgree }) => {
-  function handleDisagree(): void {
-    setIsAgree(false);
-    setId('');
-  }
-  async function handleAgree(): Promise<void> {
-    deletion(id)
-    setId('');
+export const ConfirmationDialog: React.FC<Props> = ({ content, title, open, onCloseFn }) => {
+
+  async function handleClose(isAgree: boolean) {
+    onCloseFn(isAgree);
   }
 
-  return <div>
+  return <Box>
     <Dialog
-      open={isAgree}
+      open={open}
+      onClose={handleClose}
       aria-labelledby="alert-dialog-title"
       aria-describedby="alert-dialog-description"
     >
       <DialogTitle id="alert-dialog-title">
-        {dialogTitle}
+        {title}
       </DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
-          {dialogContent}
+          {content}
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={handleDisagree}>Disagree</Button>
-        <Button onClick={handleAgree} autoFocus>Agree</Button>
+        <Button onClick={() => handleClose(false)}>Disagree</Button>
+        <Button onClick={() => handleClose(true)} autoFocus>Agree</Button>
       </DialogActions>
     </Dialog>
-  </div>
+  </Box>
 }
 export default ConfirmationDialog;

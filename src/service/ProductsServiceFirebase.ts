@@ -15,11 +15,17 @@ export class ProductsServiceFirebase implements ProductsService {
     productsCollection = collection(getFirestore(firebaseApp), PRODUCTS_COLLECTION);
     categoriesCollection = collection(getFirestore(firebaseApp), CATEGORIES_COLLECTION)
     async addProduct(product: ProductType): Promise<void> {
-        if(!product.id){
-            product.id = getRandomNumber(100000, 999999).toString()
-        }
-        await setDoc(doc(this.productsCollection, product.id), product)
-    }
+        if(!product.id) {
+            do {
+             product.id = getRandomNumber(100000, 999999).toString();
+             const isIdFound = (await getDoc(doc(this.productsCollection, product.id))).exists();
+             if (!isIdFound){
+                 break
+             }
+            } while(true);
+        } 
+        await setDoc(doc(this.productsCollection, product.id), product);
+     }
     async addCategory(category: CategoryType): Promise<void> {
         await setDoc(doc(this.categoriesCollection, category.name), category)
     }
