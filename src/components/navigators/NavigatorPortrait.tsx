@@ -1,53 +1,65 @@
-import { AppBar, Box, Drawer, IconButton, List, Tab, Tabs, Toolbar, Typography } from "@mui/material"
+import { AppBar, Box, Drawer, IconButton, List, ListItem, Tab, Tabs, Toolbar, Typography } from "@mui/material"
 import { MenuOpen, ChevronLeft } from "@mui/icons-material"
 import { RouteType } from "../../model/RouteType"
-import { ReactNode, useState } from "react"
-import { Link, Outlet} from "react-router-dom"
+import { ReactNode, useEffect, useState } from "react"
+import { Link, Outlet, useLocation, useNavigate} from "react-router-dom"
 
 export type Props = {
     subnav?: boolean,
     routes: RouteType[]
 }
-export const NavigatorPortrait: React.FC<Props> = ({ subnav, routes }) => {
-    const [open, setOpen] = useState<boolean>(false);
-    const handleDrawerOpen = () => {
-        setOpen(true);
+export const NavigatorPortrait: React.FC<Props> = ({ routes }) => {
+    const [flOpen, setOpen] = useState<boolean>(false);
+    const location = useLocation();
+    const navigate = useNavigate();
+    useEffect(() => {
+        if(routes.length > 0) {
+            let routeIndex = routes.findIndex(r => r.path == location.pathname)
+            if(routeIndex < 0) {
+                routeIndex = 0;
+            }
+            navigate(routes[routeIndex].path);
+        }
+        }, [routes]);
+    
+    function toggleOpen () {
+        setOpen(!flOpen);
     };
-
-    const handleDrawerClose = () => {
-        setOpen(false);
-    };
-
-    function getTabs(): ReactNode {
-        return routes.map((route, index) => <Tab key={index} component={Link}
-            to={route.path} label={route.label} onClick={handleDrawerClose}/>)
+    function getTitle(): string {
+        const route = routes.find(r => r.path === location.pathname)
+        return route ? route.label : '';
+    }
+    function getListenItems(): ReactNode {
+        return routes.map(route => <ListItem onClick={toggleOpen} 
+            component={Link} to={route.path} key={route.path}>{route.label}</ListItem>)
     }
     return (
         <Box sx={{ marginTop: "13vh" }}>
             <AppBar position="fixed">
                 <Toolbar>
                     <IconButton
-                        onClick={handleDrawerOpen}
-                        sx={{ color: "white", mr: 2, ...(open && { display: 'none' }) }}>
+                        onClick={toggleOpen}
+                        sx={{ color: "white", mr: 2, ...(flOpen && { display: 'none' }) }}>
                         <MenuOpen />
                     </IconButton>
                     <Typography variant="h6" noWrap component="div">
-                        Bakery application
+                        {getTitle()}
                     </Typography>
-                </Toolbar>
-            </AppBar>
-            <Drawer 
-                variant="persistent"
+                    <Drawer 
+                // variant="persistent"
                 anchor="left"
-                open={open}
-                onClose={handleDrawerClose}>
-                <IconButton onClick={handleDrawerClose}>
+                open={flOpen}
+                onClose={toggleOpen}>
+                <IconButton onClick={toggleOpen}>
                 <ChevronLeft />
                 </IconButton>
                 <List sx={{display: "flex", flexDirection: "column"}}>        
-                {getTabs()}
+                {getListenItems()}
                 </List>
             </Drawer>
+                </Toolbar>
+            </AppBar>
+            
             <Outlet />
         </Box>
     );

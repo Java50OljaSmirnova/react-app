@@ -1,12 +1,13 @@
 import { useSelector } from "react-redux"
 import { OrderType } from "../../model/OrderType";
-import { Box, Snackbar, Alert, Modal } from "@mui/material";
+import { Box, Snackbar, Alert, Modal, useMediaQuery } from "@mui/material";
 import { useMemo, useState, useRef } from "react";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { LocalShipping, Visibility } from "@mui/icons-material";
 import { ordersService } from "../../config/orders-service-config";
 import { OrderContent } from "../OrderContent";
 import ConfirmationDialog from "../ConfirmationDialog";
+import { Rotate } from "../RotateNeed";
 function checkDateFormat(date: string): boolean {
     const dateParts = date.split("-");
     let res: boolean = false;
@@ -28,6 +29,7 @@ export const Orders: React.FC = () => {
     const authUser = useSelector<any, string>(state => state.auth.authUser);
     const tableData = useMemo(() => getTableData(), [orders]);
     const columns: GridColDef[] = useMemo(() => getColumns(), [authUser, orders]);
+    const portrait = useMediaQuery('(max-width: 600px)');
     function actualUpdate(isAgree: boolean) {
         if(isAgree) {
             delivery(orderId.current, deliveryDate.current);
@@ -137,7 +139,7 @@ export const Orders: React.FC = () => {
         setOpenConfirmation(true);
         return oldRow;
     }
-    return <Box sx={{
+    return portrait ? <Rotate></Rotate> : <Box sx={{
         display: "flex", flexDirection: "column", height: "80vh",
         justifyContent: "center", alignItems: "center"
     }}>

@@ -3,11 +3,12 @@ import { ShoppingDataType } from "../../model/ShoppingDataType"
 import { ProductType } from "../../model/ProductType"
 import { ShoppingProductType } from "../../model/ShoppingProductType";
 import { GridColDef, DataGrid, GridActionsCellItem } from "@mui/x-data-grid";
-import { Alert, Avatar, Box, Button, Snackbar, Typography } from "@mui/material";
+import { Alert, Avatar, Box, Button, Snackbar, Typography, useMediaQuery } from "@mui/material";
 import { useMemo, useRef, useState } from "react";
 import { ordersService } from "../../config/orders-service-config";
 import { Delete } from "@mui/icons-material";
 import ConfirmationDialog from "../ConfirmationDialog";
+import { Rotate } from "../RotateNeed";
 const UPDATE = 'Updating count of shopping product?';
 const REMOVE = 'Removing shopping product?'
 export const ShoppingCart: React.FC = () => {
@@ -46,7 +47,7 @@ export const ShoppingCart: React.FC = () => {
     ]
     const tableData = useMemo(() => getTableData(), [products, shopping]);
     const total = useMemo(() => getTotalCost(), [tableData]);
-
+const portrait = useMediaQuery('(max-width: 600px)')
     async function updateCount(newRow: any, oldRow: any) {
         const rowData: ShoppingDataType = newRow;
         if (rowData.count < 1) {
@@ -92,8 +93,9 @@ export const ShoppingCart: React.FC = () => {
         }
         return res;
     }
-    return <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '80vh', alignItems: 'center' }}>
-        <Box sx={{ width: "70vw", heigth: "60vh" }}>
+    return portrait? <Rotate></Rotate> : <Box sx={{ display: 'flex', flexDirection: 'column', 
+    justifyContent: 'center', height: '80vh', alignItems: 'center', marginTop: {sm: '20vh'} }}>
+        <Box sx={{ height: '60vh', width: {sm: '90vw', md: '75vw'}}}>
             <DataGrid columns={columns} rows={tableData} getRowHeight={() => 'auto'}
                 processRowUpdate={updateCount} onProcessRowUpdateError={(error) => {
                     alertMessage.current = error;
